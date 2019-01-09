@@ -16,9 +16,15 @@
     <button id="signout_button" style="display: none;">Sign Out</button>
 
         <!--  <input id="txtEventDetails" type="text" /> -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+<button type="button" class="btn btn-primary" onclick="FBevents();">
   Create new event
 </button>
+
+</br>
+       <form method="get" onsubmit="return FBevents()">
+<input type="submit"  value="Add fb event to calendar" class="btn btn-primary" />
+</form>
+
     <pre id="content" style="white-space: pre-wrap;"></pre>
     <pre id="gomb"  style="white-space: pre-wrap;"></pre>
 	<div id="divifm">
@@ -26,32 +32,52 @@
 	</iframe>
 	</div>
    <!-- The Modal -->
- <div class="modal" id="myModal">
+   <div class="modal" id="myModal">
+     <div class="modal-dialog">
+       <div class="modal-content">
+
+         <!-- Modal Header -->
+         <div class="modal-header">
+           <h4 class="modal-title">Creating event</h4>
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+         </div>
+
+         <!-- Modal body -->
+         <div class="modal-body">
+           <form name="myevent" method="get" onsubmit="return makeApiCall()">
+            Give details: </br>
+            <input type="text" name="summary" required /><br>
+            start: </br>
+            <input type="datetime-local" name="start" required/><br>
+            end: </br>
+            <input type="datetime-local" name="end" required/><br>
+            description: </br>
+            <input type="text" name="description" required/><br>
+            location: </br>
+            <input type="text" name="location" required/><br>
+            <input type="submit" value="Create event" id="btnCreateEvents" class="btn btn-primary"/>
+          </form>
+         </div>
+
+         <!-- Modal footer -->
+         <div class="modal-footer">
+           DEMO
+         </div>
+       </div>
+     </div>
+   </div>
+
+ <div class="modal" id="eventmodal">
    <div class="modal-dialog">
      <div class="modal-content">
 
        <!-- Modal Header -->
        <div class="modal-header">
-         <h4 class="modal-title">Creating event</h4>
+         <h4 class="modal-title">event info</h4>
          <button type="button" class="close" data-dismiss="modal">&times;</button>
        </div>
 
-       <!-- Modal body -->
-       <div class="modal-body">
-         <form name="myevent" method="get" onsubmit="return makeApiCall()">
-          Give details: </br>
-          <input type="text" name="summary" required /><br>
-          start: </br>
-          <input type="datetime-local" name="start" required/><br>
-          end: </br>
-          <input type="datetime-local" name="end" required/><br>
-          description: </br>
-          <input type="text" name="description" required/><br>
-          location: </br>
-          <input type="text" name="location" required/><br>
-          <input type="submit" value="Create event" id="btnCreateEvents" class="btn btn-primary"/>
-        </form>
-       </div>
+           <pre id="contentbyid" style="white-space: pre-wrap;"></pre>
 
        <!-- Modal footer -->
        <div class="modal-footer">
@@ -152,6 +178,43 @@
         pre.appendChild(textContent);
       }
 
+      function appendPreById(message) {
+        var pre2 = document.getElementById('contentbyid');
+        var textContent = document.createTextNode(message);
+        pre2.appendChild(textContent);
+      }
+
+
+      // Get back the event by its id
+      function getById(eventid) {
+      // Only for recreating the content in the modal (clear the content)
+        $(document).ready(function(){
+            $("#contentbyid").empty();
+      });
+        gapi.client.calendar.events.get({
+          'calendarId': 'primary',
+			    'eventId': eventid
+        }).then(function(response) {
+        //  console.log(response);
+
+          if (response != "undefined") {
+              var event = response.result;
+              var when = event.start.dateTime;
+              if (!when) {
+                when = event.start.date;
+              }
+             var contentbyid =  document.getElementById('contentbyid');
+             var id = "'" + event.id + "'";
+              appendPreById(event.summary + ' (' + when + ') \n' );
+              appendPreById(event.location + '\n');
+              appendPreById(event.description+ '\n');
+              contentbyid.innerHTML += '<button class="btn btn-primary" onclick="deleteEvent('+id+');"> Delete event</button>';
+
+          } else {
+            appendPreById('No upcoming events found.');
+          }
+        });
+      }
       /**
        * Print the summary and start datetime/date of the next ten events in
        * the authorized user's calendar. If no events are found an
@@ -179,9 +242,7 @@
              var asd =  document.getElementById('content');
              var id = "'" + event.id + "'";
               appendPre(event.summary + ' (' + when + ')');
-              asd.innerHTML += '<button id="btnDeleteEvents" class="btn btn-primary" onclick="deleteEvent('+id+');"> Delete event</button> \n';
-
-
+              asd.innerHTML += '<button id="btnDeleteEvents" class="btn btn-primary" onclick="getById('+id+');" data-toggle="modal" data-target="#eventmodal"> Details</button> \n';
             }
           } else {
             appendPre('No upcoming events found.');
@@ -296,11 +357,31 @@ var resource = {
 		 });
 	   }
 
-     // Facebook events to be imported to the calendarId
-     function FBevents(fbevent){
+     var fbevent = {
+       "events": {
+    "data":
+      {
+        "name": "Úplné zatmenie Slnka v  roku 2081",
+        "description": "Kto sa už nemôže dočkať úplného zatmenia Slnka v roku 2081? :D Potvrďte svoju účasť!",
+        "place": {
+          "name": "Slovakia",
+          "location": {
+            "latitude": 49,
+            "longitude": 20
+          }
+        },
+        "start_time": "2019-01-10T10:00:00+0100",
+        "end_time": "2019-01-10T11:00:00+0100",
+        "id": "1591007397834172"
+      }
+     }
+   };
 
+     // Facebook events to be imported to the calendarId
+     function FBevents(){
+            var eventResponse = document.getElementById('event-response');
        var addnewFbEvent = {
-         "id" : fbevent.events.data.id,
+        // "id" : fbevent.events.data.id,
          "summary": fbevent.events.data.name,
          "start": {
                    "dateTime": fbevent.events.data.start_time
@@ -309,24 +390,25 @@ var resource = {
                    "dateTime": fbevent.events.data.end_time
                },
                "description": fbevent.events.data.description,
-               "location": fbevent.events.data.location.country
+               "location": fbevent.events.data.place.name
        };
-
        gapi.client.load('calendar', 'v3', function () {     // load the calendar api (version 3)
            var request = gapi.client.calendar.events.insert
            ({
                'calendarId': 'primary',              // calendar ID
-               "resource": addnewFbEvent		 // pass event details with api call
+               "resource": addnewFbEvent// pass event details with api call
            });
 
+      console.log(request);
            // handle the response from our api call
            request.execute(function (resp) {
+                   console.log(resp.status);
                if (resp.status == 'confirmed') {
                    eventResponse.innerHTML = "Event created successfully. View it <a href='" + resp.htmlLink + "'>online here</a>.";
                    eventResponse.className += ' panel-success';
                    refreshICalendarframe();
                } else {
-                   document.getElementById('event-response').innerHTML = "There was a problem. Reload page and try again.";
+                   eventResponse.innerHTML = "There was a problem. Reload page and try again.";
                    eventResponse.className += ' panel-danger';
                }
            });
