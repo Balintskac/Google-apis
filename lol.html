@@ -16,7 +16,7 @@
     <button id="signout_button" style="display: none;">Sign Out</button>
 
         <!--  <input id="txtEventDetails" type="text" /> -->
-<button type="button" class="btn btn-primary" onclick="FBevents();">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" >
   Create new event
 </button>
 
@@ -28,8 +28,7 @@
     <pre id="content" style="white-space: pre-wrap;"></pre>
     <pre id="gomb"  style="white-space: pre-wrap;"></pre>
 	<div id="divifm">
-    	<iframe src="https://calendar.google.com/calendar/embed?src=balint386%40gmail.com&ctz=Europe%2FBudapest" style="border: 0" width="800" height="600" frameborder="0" scrolling="no">
-	</iframe>
+    <iframe src="https://calendar.google.com/calendar/embed?src=eventshare.hu%40gmail.com&ctz=Europe%2FBudapest" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
 	</div>
    <!-- The Modal -->
    <div class="modal" id="myModal">
@@ -94,8 +93,8 @@
         var twoHoursLater = new Date(now.getTime() + (2 * 1000 * 60 * 60));
         twoHoursLater = twoHoursLater.toISOString();
       // Client ID and API key from the Developer Console
-      var CLIENT_ID = '151667331145-paibcuknr1sjq733uhvoom1tdd5112kd.apps.googleusercontent.com';
-      var API_KEY = 'AIzaSyCWdc5SbMuFr0odGgq4Qh8eSE_x6B2Ijgk';
+      var CLIENT_ID = '805555023782-cdl1vdaos8uf4laidm9f4jg7q7jc3mvr.apps.googleusercontent.com';
+      var API_KEY = 'AIzaSyDf1ZfRLwWnXGbZ3i87znYAHR7JUSXYxF8';
 
       // Array of API discovery doc URLs for APIs used by the quickstart
       var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
